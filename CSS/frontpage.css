@@ -1,0 +1,20 @@
+
+/* COUNTRIES */
+
+.sweden {
+    width: 100px;
+    height: 100px;
+    background-color: red;
+}
+
+.norway {
+    width: 100px;
+    height: 100px;
+    background-color: blue;
+}
+
+.finland {
+    width: 100px;
+    height: 100px;
+    background-color: green;
+}
