@@ -4,30 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="styles.css">
     <title>Country Details</title>
 </head>
 <body>
-
         <div class="pagewrapper">
             <h2 class="page-heading"></h2>
-            <div class="page-view">
-                <!-- dynamic content goes here -->
-                
-                <a href="/city-list.html" class="city-page">Cities I have visited</a>
-            </div>
-        </div>
-        
-        <!-- HTML TEMPLATEs -->
-        <div id="html-templates" class="html-templates">
-            <!-- country template -->
-            <div id="country-template" class="country-template">
-                <h2 class="country-name"></h2>
-                <ul class="city-list">
+            <main class="page-view countrydetail">
+                <ul class="list-container countrydetail__list">
                     <!-- dynamic content goes here -->
                 </ul>
-            </div>
-
+                <a href="/city-list.html" class="city-page">Cities I have visited</a>
+                <button id="button-clear-all">Start Over</button>
+            </main>
         </div>
+        
     
     <script src="/js/countryDetail.js"></script>
 </body>

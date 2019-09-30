@@ -1,8 +1,9 @@
 
 // REFS
-let pageViewElement = document.querySelector(".page-view");
 let pageHeading = document.querySelector(".page-heading");
-let cityList;
+let listContainer = document.querySelector(".list-container");
+let buttonClearAll = document.querySelector("#button-clear-all");
+let storedID;
 let cityArray;
 
 if(localStorage.getItem("cityarray")) {
@@ -12,80 +13,92 @@ if(localStorage.getItem("cityarray")) {
     cityArray = [];
 }
 
+if(localStorage.getItem("countryid")){
+    let temp = localStorage.getItem("countryid");
+    storedID = temp;
+} else {
+    printErrorMessage("Der mangler et Country ID")
+}
+
 fetch("data/stad.json")
 // mellem-then() skal altid skrives på denne/samme måde
 .then((response)=>{
     // console.log(response);
     return response.json();
 })
-.then((data)=>{
-    // console.log(data);
-    let countryData = data;
-    let storedID = localStorage.getItem("id");
+.then((dataset)=>{
+    let data = dataset;
     pageReady();
-    cloneTemplate("#country-template");
-    cityList = document.querySelector(".city-list");
-    insertData(countryData, storedID, cityList);
+    createHTML(data, storedID, 'city-detail.html')
+    clearAll(buttonClearAll);
 });
 
 function pageReady(){
-    let storedName = localStorage.getItem("name");
+    let storedName = localStorage.getItem("countryname");
     pageHeading.innerHTML = storedName;
+    buttonClearAll.style.display = 'block';
 }
 
-function cloneTemplate(classname){
-    let template = document.querySelector(classname);
-    let newNode = template.cloneNode(true);
-    pageViewElement.insertAdjacentElement('beforebegin', newNode);
-}
-
-function insertData(jsonarray, id, listElement) {
+function createHTML(jsonarray, id, filepath) {
     jsonarray.forEach(obj => {
-        let objectID = obj[Object.keys(obj)[2]];
-        // console.log(obj[Object.keys(jsonobject)[0]]);
-        if(objectID == id){
+        if(obj.countryid == id){
             let listItem = document.createElement("li");
-            // create a-tag to redirect to city info.
-            let label = document.createElement("label");
-            label.dataset.id = obj[Object.keys(obj)[0]];
-            // console.log(element.dataset.id);
-            label.dataset.name = obj[Object.keys(obj)[1]];
-            label.innerHTML = obj[Object.keys(obj)[1]];
-            label.addEventListener('click', (event) => {
-                clickEvent(event);
+            listItem.classList.add("countrydetail__city");
+            let element = document.createElement("a");
+            element.href = filepath;
+            element.dataset.id = obj[Object.keys(obj)[0]];
+            element.innerHTML = obj[Object.keys(obj)[1]];
+            element.dataset.name = obj[Object.keys(obj)[1]];
+            element.addEventListener('click', (event) => {
+                handleClickEvent(event);
             });
+            element.classList.add("countrydetail__citylink");
             // create checkbox to add city to array
             let checkBox = document.createElement("input");
             checkBox.setAttribute("type", "checkbox");
             checkBox.addEventListener('change', (event) => {
-                onCheckEvent(event, label);
+                onCheckEvent(event, element);
             });
-            // append to htmldoc
-            listItem.appendChild(label);
+            checkBox.classList.add("countrydetail__checkbox");
+             // append to htmldoc
+            listItem.appendChild(element);
             listItem.appendChild(checkBox);
-            listElement.appendChild(listItem);                
+            listContainer.insertAdjacentElement('afterbegin', listItem);
         }
     });
 }
 
-function clickEvent(event) {
+
+function handleClickEvent(event) {
     let elementID = event.target.dataset.id;
     let elementName = event.target.dataset.name;
-    localStorage.removeItem("id");
-    localStorage.removeItem("name");
-    localStorage.setItem("id", elementID);
-    localStorage.setItem("name", elementName);
-    window.location.pathname = "/city-detail.html";
+    clearLocalStorage();
+    localStorage.setItem("cityid", elementID);
+    localStorage.setItem("cityname", elementName);
 }
 
-function onCheckEvent(event, labelelem) {
+function clearLocalStorage() {
+    localStorage.removeItem("cityid");
+    localStorage.removeItem("cityname");
+}
+
+function onCheckEvent(event, element) {
     if(event.target.checked){
-        console.log("checked");
-        console.log(labelelem.dataset.id);
-        cityArray.push(labelelem.dataset.id);
-        // localStorage.removeItem("cityarray");
+        cityArray.push(element.dataset.id);
         localStorage.setItem("cityarray", JSON.stringify(cityArray));
-        console.log(localStorage["cityarray"]);
     }
+}
+
+function clearAll(element) {
+    element.addEventListener('click', (event) => {
+        location.pathname = '/index.html'
+    })
+}
+
+function printErrorMessage(message){
+    let element = document.createElement("li");
+    element.innerHTML = message;
+    element.classList.add("error-message");
+    listContainer.appendChild(element);
 }
 

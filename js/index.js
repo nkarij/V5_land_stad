@@ -1,15 +1,15 @@
 
-if(localStorage.getItem("id") || localStorage.getItem("name")) {
-    localStorage.removeItem("id");
-    localStorage.removeItem("name");
+
+// clear localStorage:
+if(localStorage.getItem("countryid") || localStorage.getItem("cityid")) {
+    // localStorage.removeItem("id");
+    clearLocalStorage();
 }
 
-// REFS
-let pageViewElement = document.querySelector(".page-view");
-let countryList;
+// References, excisting HTML
+let listContainer = document.querySelector(".list-container");
 
 fetch("data/land.json")
-// mellem-then() skal altid skrives på denne/samme måde
 .then((response)=>{
     // console.log(response);
     return response.json();
@@ -17,37 +17,33 @@ fetch("data/land.json")
 .then((data)=>{
     // console.log(data);
     let countryData = data;
-    cloneTemplate("#country-template");
-    countryList = document.querySelector(".country-list");
-    createHTML(countryData, countryList);
+    createHTML(countryData, "country-detail.html");
 });
 
-
-function cloneTemplate(classname){
-    let template = document.querySelector(classname);
-    let newNode = template.cloneNode(true);
-    pageViewElement.insertAdjacentElement('afterbegin', newNode);
-}
-
-function createHTML(jsonarray, listElement) {
+function createHTML(jsonarray, filepath) {
     jsonarray.forEach(obj => {
-        let element = document.createElement("li");
+        let element = document.createElement("a");
+        element.href = filepath;
         element.dataset.id = obj[Object.keys(obj)[0]];
         element.innerHTML = obj[Object.keys(obj)[1]];
         element.dataset.name = obj[Object.keys(obj)[1]];
+        element.classList.add("country-item");
         element.addEventListener('click', (event) => {
-            clickEvent(event);
+            handleClickEvent(event);
         });
-        listElement.insertAdjacentElement('afterbegin', element);                
+        listContainer.insertAdjacentElement('afterbegin', element);                
     });
 }
 
-function clickEvent(event) {
+function handleClickEvent(event) {
     let elementID = event.target.dataset.id;
     let elementName = event.target.dataset.name;
-    localStorage.removeItem("id");
-    localStorage.removeItem("name");
-    localStorage.setItem("id", elementID);
-    localStorage.setItem("name", elementName);
-    window.location.pathname = "/country-detail.html";
+    clearLocalStorage();
+    localStorage.setItem("countryid", elementID);
+    localStorage.setItem("countryname", elementName);
+}
+
+function clearLocalStorage() {
+    localStorage.removeItem("countryid");
+    localStorage.removeItem("countryname");
 }
