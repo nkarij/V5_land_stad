@@ -1,19 +1,14 @@
 
 // REFS
 let pageViewElement = document.querySelector(".page-view");
-let listContainers = document.querySelectorAll(".list-container");
+let cityList = document.querySelector(".citylist");
+let population = document.querySelector(".citylist__population");
 let buttonClearList = document.querySelector("#button-clear-list");
+let buttonGoBack = document.querySelector("#button-go-back");
 let buttonClearAll = document.querySelector("#button-clear-all");
-let totalPopulation;
+let totalPopulation = 0;
 let cityArray;
 
-if(localStorage.getItem("population")) {
-    let temp = localStorage.getItem("population");
-    totalPopulation = JSON.parse(temp);
-} else {
-    totalPopulation = 0;
-    clearAll(buttonClearAll);
-}
 
 if(localStorage.getItem("cityarray")){
     let temp = localStorage.getItem("cityarray");
@@ -23,10 +18,10 @@ if(localStorage.getItem("cityarray")){
     cityArray = [];
     printErrorMessage("The list is empty");
     buttonClearList.disabled = true;
-    clearAll(buttonClearAll);
+    createClearAllEvent(buttonClearAll);
     clearList();
+    goBack(buttonGoBack);
 }
-
 
 fetch("data/stad.json")
 // mellem-then() skal altid skrives på denne/samme måde
@@ -40,31 +35,32 @@ fetch("data/stad.json")
     createHTML(cityArray, data);
     printTotalPopulation(totalPopulation);
     clearList();
-    clearAll(buttonClearAll);
+    createClearAllEvent(buttonClearAll);
+    goBack(buttonGoBack);
 });
 
 function createHTML(cityarray, citydata){
     cityarray.forEach(id => {
         citydata.forEach(obj => {
             if(id == obj.id) {
-                // console.log(obj.population);
+                console.log(obj.population);
                 let sum = totalPopulation += obj.population;
                 let listItem = document.createElement("li");
                 listItem.classList.add("citylist__item");
                 listItem.innerHTML = obj.stadname;
-                listContainers[0].appendChild(listItem);
+                cityList.appendChild(listItem);
             }
         });
     });
+    console.log(totalPopulation);
     buttonClearAll.style.display = 'block';
 }
 
 function printTotalPopulation(totalPopulation){
     let element = document.createElement("li");
-    element.classList.add("citylist__population");
+    element.classList.add("population");
     element.innerHTML = totalPopulation;
-    listContainers[1].appendChild(element);
-    localStorage.setItem("population", totalPopulation);
+    population.appendChild(element);
 }
 
 function clearList() {
@@ -75,15 +71,26 @@ function clearList() {
     })
 }
 
-function clearAll(element) {
+function createClearAllEvent(element) {
     element.addEventListener('click', (event) => {
-        location.pathname = '/index.html'
-    })
+        event.preventDefault();
+        localStorage.clear();
+        location.pathname = '/index.html';
+    });
 }
+
+function goBack(element) {
+    element.addEventListener('click', (event) => {
+        console.log("clear");
+        event.preventDefault();
+        localStorage.removeItem("cityArray");
+        location.pathname = '/index.html';
+    });
+}    
 
 function printErrorMessage(message){
     let element = document.createElement("li");
     element.innerHTML = message;
     element.classList.add("error-message");
-    listContainers[0].appendChild(element);
+    cityList.appendChild(element);
 }

@@ -6,11 +6,7 @@ let buttonClearAll = document.querySelector("#button-clear-all");
 let listContainer = document.querySelector(".list-container");
 let storedID;
 
-if(localStorage.getItem("cityid")){
-    storedID = localStorage.getItem("cityid");
-} else {
-    printErrorMessage("Der mangler et City Id");
-}
+
 
 fetch("data/stad.json")
 // mellem-then() skal altid skrives på denne/samme måde
@@ -19,11 +15,18 @@ fetch("data/stad.json")
     return response.json();
 })
 .then((dataset)=>{
-    let data = dataset;    
+    let data = dataset;
+    
+    if(localStorage.getItem("cityid")){
+        storedID = localStorage.getItem("cityid");
+    } else {
+        printErrorMessage("Der mangler et City Id");
+        createClearAllEvent(buttonClearAll);
+    }
     console.log(storedID);
     pageReady(data, storedID);
     createHTML(data, storedID);
-    clearAll(buttonClearAll);
+    createClearAllEvent(buttonClearAll);
 });
 
 function pageReady(jsonarray, id){
@@ -48,12 +51,14 @@ function createHTML(jsonarray, id) {
     buttonClearAll.style.display = 'block';
 }
 
-function clearAll(element) {
+function createClearAllEvent(element) {
     element.addEventListener('click', (event) => {
-        location.pathname = '/index.html'
-    })
-}
-
+        console.log("clear");
+        event.preventDefault();
+        localStorage.removeItem("cityID");
+        location.pathname = '/index.html';
+    });
+}    
 
 function printErrorMessage(message){
     let element = document.createElement("li");
